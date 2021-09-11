@@ -1,4 +1,4 @@
-import { FaPencilAlt, FaTimes } from "react-icons/fa";
+import { FaPencilAlt, FaTimes, FaTwitch } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import Layout from "@/components/Layout";
@@ -24,12 +24,16 @@ function EventPage({ evt }) {
           </a>
         </div>
         <span>
-          {evt.date} at {evt.time}
+          {new Date(evt.date).toLocaleDateString("en-us")} at {evt.time}
         </span>
         <h1>{evt.name}</h1>
         {evt.image && (
           <div className={styles.image}>
-            <Image src={evt.image} width={960} height={600} />
+            <Image
+              src={evt.image.formats.medium.url}
+              width={960}
+              height={600}
+            />
           </div>
         )}
 
@@ -41,7 +45,7 @@ function EventPage({ evt }) {
         <p>{evt.address}</p>
 
         <Link href='/events'>
-          <a className={styles.back}>{'<'} Go Back</a>
+          <a className={styles.back}>{"<"} Go Back</a>
         </Link>
       </div>
     </Layout>
@@ -50,13 +54,39 @@ function EventPage({ evt }) {
 
 export default EventPage;
 
-export async function getServerSideProps({ query: { slug } }) {
-  const res = await fetch(`${API_URL}/api/events/${slug}`);
+export async function getStaticPaths() {
+  const res = await fetch(`${API_URL}/events`);
+  const events = await res.json();
+
+  const paths = events.map((evt) => ({
+    params: { slug: evt.slug },
+  }));
+
+  return {
+    paths,
+    fallback: true,
+  };
+}
+
+export async function getStaticProps({ params: { slug } }) {
+  const res = await fetch(`${API_URL}/events?slug=${slug}`);
   const events = await res.json();
 
   return {
     props: {
       evt: events[0],
     },
+    revalidate: 1,
   };
 }
+
+// export async function getServerSideProps({ query: { slug } }) {
+//   const res = await fetch(`${API_URL}/events/${slug}`);
+//   const events = await res.json();
+
+//   return {
+//     props: {
+//       evt: events[0],
+//     },
+//   };
+// }
