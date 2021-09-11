@@ -1,4 +1,4 @@
-import Layout from "../components/Layout";
+import Layout from "@/components/Layout";
 import { API_URL } from "../config/index";
 
 export default function Home({ events }) {
