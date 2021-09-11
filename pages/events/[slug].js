@@ -1,11 +1,23 @@
-import Layout from '@/components/Layout'
+import Layout from "@/components/Layout";
+import { API_URL } from "../../config/index";
 
-function EventPage() {
+function EventPage({ evt }) {
   return (
     <Layout>
-      <h1>My Event</h1>
+      <h1>{evt.name}</h1>
     </Layout>
   );
 }
 
 export default EventPage;
+
+export async function getServerSideProps({ query: { slug } }) {
+  const res = await fetch(`${API_URL}/api/events/${slug}`);
+  const events = await res.json();
+
+  return {
+    props: {
+      evt: events[0],
+    },
+  };
+}
